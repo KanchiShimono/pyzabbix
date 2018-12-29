@@ -2,6 +2,10 @@ import json
 import urllib.request
 
 
+class ZabbixAPIException(Exception):
+    pass
+
+
 class ZabbixAPI(object):
     def __init__(self,
                  server):
@@ -46,6 +50,15 @@ class ZabbixAPI(object):
         except ValueError:
             print('Cannot parse res_json')
             raise
+
+        if 'error' in res_json:
+            message = 'Error {code}: {message}, {data}'.format(
+                code=res_json['error']['code'],
+                message=res_json['error']['message'],
+                data=res_json['error']['data']
+            )
+
+            raise ZabbixAPIException(message)
 
         return res_json
 
